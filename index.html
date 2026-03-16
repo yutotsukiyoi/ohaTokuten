@@ -121,6 +121,41 @@
       opacity: 0.5;
     }
 
+    /* ========== NOTES SECTION ========== */
+    .notes-card {
+      background: var(--warm-white);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px var(--shadow);
+      animation: fadeUp 0.6s 0.45s ease both;
+    }
+
+    .notes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .notes-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .notes-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--brown-light);
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
     /* ========== POINT CONVERSION CARD ========== */
     .point-conv-card {
       background: var(--warm-white);
@@ -352,34 +387,16 @@
   <div class="page-wrapper">
     <header>
       <span class="logo-icon">🍵</span>
-      <div class="site-title">お茶爆得点</div>
-      <div class="site-subtitle">投げ銭特典交換サービス</div>
+      <div class="site-title">お茶爆特典</div>
+      <div class="site-subtitle">お茶爆特典について</div>
     </header>
 
     <!-- ポイント換算表 -->
     <div class="point-conv-card">
       <div class="section-title">ポイント換算</div>
-      <div class="conv-grid">
-        <div class="conv-item">
-          <span class="conv-tea">お茶爆500</span>
-          <span class="conv-arrow">→</span>
-          <span class="conv-pt">5pt</span>
-        </div>
-        <div class="conv-item">
-          <span class="conv-tea">お茶爆300</span>
-          <span class="conv-arrow">→</span>
-          <span class="conv-pt">3pt</span>
-        </div>
-        <div class="conv-item">
-          <span class="conv-tea">お茶爆100</span>
-          <span class="conv-arrow">→</span>
-          <span class="conv-pt">1pt</span>
-        </div>
-        <div class="conv-item">
-          <span class="conv-tea">お茶爆50</span>
-          <span class="conv-arrow">→</span>
-          <span class="conv-pt">0.5pt</span>
-        </div>
+      <div style="text-align:center; padding: 8px 0;">
+        <span style="font-size:16px; font-weight:700; color:var(--tea-dark);">お茶爆100 ＝ 1pt</span>
+        <span style="font-size:13px; color:var(--text-muted); margin-left:4px;">とします</span>
       </div>
     </div>
 
@@ -418,7 +435,7 @@
         </div>
         <div class="benefit-body">
           <div class="benefit-name">ビデオメッセージ 📹</div>
-          <div class="benefit-note">申請後2週間以内にお届けします</div>
+          <div class="benefit-note">テーマをいただければそれについて話します</div>
           <div class="benefit-tag">📬 2週間以内</div>
         </div>
       </div>
@@ -460,6 +477,31 @@
       </div>
       <div id="errorMsg" class="error-msg">ユーザー名を入力してください</div>
       <button class="go-btn" onclick="goToMyPage()">マイページを見る →</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 注意事項 -->
+    <div class="notes-card">
+      <div class="section-title">注意事項</div>
+      <div class="notes-list">
+        <div class="notes-item">
+          <div class="notes-dot"></div>
+          <div>ポイントに有効期限はありません。</div>
+        </div>
+        <div class="notes-item">
+          <div class="notes-dot"></div>
+          <div>ポイントの譲渡・換金・返金はできません。</div>
+        </div>
+        <div class="notes-item">
+          <div class="notes-dot"></div>
+          <div>特典の申請はDMにてお願いします。</div>
+        </div>
+        <div class="notes-item">
+          <div class="notes-dot"></div>
+          <div>利用状況に応じて特典内容を変更する場合があります。変更の際は事前にお知らせします。</div>
+        </div>
+      </div>
     </div>
 
     <footer>
