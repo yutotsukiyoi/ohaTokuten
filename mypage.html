@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>マイページ ☕ お茶爆得点</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Shippori+Mincho:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #fdf8f2;
+      --warm-white: #fffcf8;
+      --tea-green: #8bae8a;
+      --tea-dark: #5a7a59;
+      --tea-light: #c8ddc7;
+      --tea-pale: #eaf3e9;
+      --brown: #7a5c44;
+      --brown-light: #c4a882;
+      --gold: #c9922a;
+      --text: #3d2f22;
+      --text-muted: #8a7466;
+      --shadow: rgba(90, 60, 30, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--tea-light) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: -100px;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, #f5e6d0 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+    }
+
+    /* ========== HEADER ========== */
+    header {
+      display: flex;
+      align-items: center;
+      padding: 20px 0 16px;
+      gap: 12px;
+    }
+
+    .back-btn {
+      width: 40px; height: 40px;
+      background: var(--warm-white);
+      border: 1.5px solid var(--tea-light);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      text-decoration: none;
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: transform 0.15s;
+      flex-shrink: 0;
+    }
+    .back-btn:active { transform: scale(0.94); }
+
+    .header-text { flex: 1; }
+    .header-site { font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; }
+    .header-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 18px;
+      color: var(--tea-dark);
+      font-weight: 600;
+    }
+
+    .header-icon { font-size: 28px; }
+
+    /* ========== LOADING ========== */
+    #loadingState {
+      text-align: center;
+      padding: 60px 20px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .loading-spinner {
+      font-size: 40px;
+      display: block;
+      margin-bottom: 16px;
+      animation: spin 2s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: var(--text-muted); font-size: 14px; }
+
+    /* ========== ERROR ========== */
+    #errorState {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .error-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+    .error-title { font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+    .error-sub { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ========== MAIN CONTENT ========== */
+    #mainContent { display: none; }
+
+    /* ========== USER PROFILE CARD ========== */
+    .profile-card {
+      background: linear-gradient(135deg, var(--tea-dark) 0%, #3d5c3c 100%);
+      border-radius: 24px;
+      padding: 24px 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 24px rgba(90, 122, 89, 0.3);
+      color: white;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.5s 0.05s ease both;
+    }
+
+    .profile-card::before {
+      content: '🍵';
+      position: absolute;
+      right: 18px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 72px;
+      opacity: 0.12;
+    }
+
+    .profile-label {
+      font-size: 11px;
+      opacity: 0.75;
+      letter-spacing: 0.12em;
+      margin-bottom: 4px;
+    }
+    .profile-username {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      word-break: break-all;
+    }
+
+    .pt-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .pt-num {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 52px;
+      line-height: 1;
+      font-weight: 600;
+      color: #f5d990;
+    }
+    .pt-unit {
+      font-size: 18px;
+      font-weight: 700;
+      color: rgba(245, 217, 144, 0.85);
+      margin-bottom: 6px;
+    }
+
+    .pt-updated {
+      font-size: 11px;
+      opacity: 0.6;
+      margin-top: 8px;
+    }
+
+    /* ========== SECTION TITLE ========== */
+    .section-title {
+      font-family: 'Shippori Mincho', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--brown);
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title::before, .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--brown-light);
+      opacity: 0.4;
+    }
+
+    /* ========== COMBINATIONS ========== */
+    .combo-intro {
+      background: var(--warm-white);
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      box-shadow: 0 2px 10px var(--shadow);
+      animation: fadeUp 0.5s 0.1s ease both;
+      border-left: 4px solid var(--tea-green);
+    }
+
+    .combo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+
+    .combo-card {
+      background: var(--warm-white);
+      border-radius: 18px;
+      padding: 16px 18px;
+      box-shadow: 0 3px 14px var(--shadow);
+      transition: transform 0.15s;
+    }
+    .combo-card:active { transform: scale(0.98); }
+
+    .combo-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .combo-num {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--cream);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .combo-remaining {
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .combo-remaining.positive { color: var(--tea-dark); }
+    .combo-remaining.zero { color: var(--gold); }
+
+    .combo-items {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .combo-item-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .combo-badge {
+      min-width: 38px;
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .badge-gold { background: #fdf0d5; color: var(--gold); }
+    .badge-green { background: var(--tea-pale); color: var(--tea-dark); }
+    .badge-blue { background: #dde8f5; color: #4a72a0; }
+    .badge-purple { background: #f5e0f3; color: #8a4f88; }
+
+    .combo-item-name {
+      flex: 1;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .combo-divider {
+      height: 1px;
+      background: var(--cream);
+      margin: 6px 0;
+    }
+
+    /* no combinations available */
+    .no-combo {
+      background: var(--warm-white);
+      border-radius: 18px;
+      padding: 32px 20px;
+      text-align: center;
+      box-shadow: 0 3px 14px var(--shadow);
+      animation: fadeUp 0.5s 0.15s ease both;
+    }
+    .no-combo-icon { font-size: 40px; display: block; margin-bottom: 12px; }
+    .no-combo-text { font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+    /* ========== FOOTER ========== */
+    .page-footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 11px;
+      color: var(--text-muted);
+      animation: fadeUp 0.5s 0.4s ease both;
+    }
+
+    /* ========== DUMMY BADGE ========== */
+    .dummy-badge {
+      display: inline-block;
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header>
+      <a href="index.html" class="back-btn" aria-label="トップへ戻る">←</a>
+      <div class="header-text">
+        <div class="header-site">お茶爆得点</div>
+        <div class="header-title">マイページ</div>
+      </div>
+      <span class="header-icon">🍵</span>
+    </header>
+
+    <!-- Loading -->
+    <div id="loadingState">
+      <span class="loading-spinner">☕</span>
+      <div class="loading-text">ポイントを確認しています…</div>
+    </div>
+
+    <!-- Error -->
+    <div id="errorState">
+      <span class="error-icon">🍂</span>
+      <div class="error-title">ユーザーが見つかりません</div>
+      <div class="error-sub">ユーザー名を確認して、もう一度お試しください。<br>配信者からお知らせされたユーザー名をご確認ください。</div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent">
+      <!-- プロフィール & ポイント -->
+      <div class="profile-card">
+        <div class="profile-label">ユーザー名</div>
+        <div class="profile-username" id="displayUsername">—</div>
+        <div class="pt-row">
+          <div class="pt-num" id="displayPoints">0</div>
+          <div class="pt-unit">pt</div>
+        </div>
+        <div class="pt-updated" id="lastUpdated">—</div>
+      </div>
+
+      <!-- 交換できる組み合わせ -->
+      <div class="section-title" style="margin-bottom:12px;">交換できる組み合わせ <span class="dummy-badge">ダミーデータ</span></div>
+
+      <div class="combo-intro" id="comboIntro">—</div>
+
+      <div class="combo-list" id="comboList">
+        <!-- JS で生成 -->
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer" style="position:relative;z-index:1;">
+    <p>© 2025 お茶爆得点</p>
+  </div>
+
+  <script>
+    /* ==================================================
+       設定エリア（本番環境で書き換える）
+       ================================================== */
+    const CONFIG = {
+      // GASデプロイ後のWebアプリURL（本番では実際のURLに変更）
+      GAS_URL: 'https://script.google.com/macros/s/AKfycbwv6XiLaqfwgWXUkMCKcTdTMrrs3caDCqJD4o7_PCNV15CNjlp3uMzM94PFw8irRm4R/exec',
+      // ダミーデータを使うか
+      USE_DUMMY_DATA: false,
+    };
+
+    /* ==================================================
+       ダミーデータ（本番では不要）
+       ================================================== */
+    const DUMMY_USERS = {
+      'sakura123':   { points: 8.5,  updated: '2025-07-15 20:00' },
+      'yuki456':     { points: 3.5,  updated: '2025-07-14 19:30' },
+      'haru789':     { points: 1.0,  updated: '2025-07-13 21:00' },
+      'demo':        { points: 14.0, updated: '2025-07-15 22:00' },
+      'testuser':    { points: 0.5,  updated: '2025-07-10 18:00' },
+    };
+
+    /* ==================================================
+       特典定義
+       ================================================== */
+    const BENEFITS = [
+      {
+        id: 'live1on1',
+        name: '1on1 限定配信',
+        basePt: 5,
+        extraPtPer: 1,     // 1ptごとに5分追加
+        extraMinPer: 5,
+        baseMin: 10,
+        badgeClass: 'badge-gold',
+        emoji: '🎙️',
+        isExtendable: true,
+      },
+      {
+        id: 'utaite',
+        name: 'ワンコーラス歌ってみた',
+        basePt: 3,
+        badgeClass: 'badge-green',
+        emoji: '🎵',
+        isExtendable: false,
+      },
+      {
+        id: 'video',
+        name: 'ビデオメッセージ',
+        basePt: 1,
+        badgeClass: 'badge-blue',
+        emoji: '📹',
+        isExtendable: false,
+      },
+      {
+        id: 'letter',
+        name: 'お手紙',
+        basePt: 0.5,
+        badgeClass: 'badge-purple',
+        emoji: '✉️',
+        isExtendable: false,
+      },
+    ];
+
+    /* ==================================================
+       ポイント取得（GAS）
+       ================================================== */
+    async function fetchPointsFromGAS(username) {
+      const url = `${CONFIG.GAS_URL}?user=${encodeURIComponent(username)}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('GAS エラー: ' + res.status);
+      const data = await res.json();
+      if (data.error) return null;
+      return { points: data.points, updated: null };
+    }
+
+    /* ==================================================
+       組み合わせ計算
+       ================================================== */
+    function calcCombinations(totalPt) {
+      const results = [];
+
+      // 1on1 配信の有効な消費ptを列挙（5pt, 6pt, 7pt...totalPt以下）
+      const live1on1Options = [];
+      if (totalPt >= 5) {
+        for (let usedPt = 5; usedPt <= totalPt; usedPt += 1) {
+          const extraMin = (usedPt - 5) * 5;
+          live1on1Options.push({ usedPt, minutes: 10 + extraMin });
+        }
+      }
+      // 1on1 なし のケースも加える
+      live1on1Options.unshift(null);
+
+      for (const liveOpt of live1on1Options) {
+        const remainAfterLive = totalPt - (liveOpt ? liveOpt.usedPt : 0);
+
+        // 残りで utaite, video, letter を全組み合わせ（0〜N個）
+        const maxUtaite = Math.floor(remainAfterLive / 3);
+        for (let nu = 0; nu <= maxUtaite; nu++) {
+          const r2 = remainAfterLive - nu * 3;
+          const maxVideo = Math.floor(r2 / 1);
+          for (let nv = 0; nv <= maxVideo; nv++) {
+            const r3 = r2 - nv * 1;
+            const maxLetter = Math.floor(r3 / 0.5);
+            for (let nl = 0; nl <= maxLetter; nl++) {
+              const usedTotal = (liveOpt ? liveOpt.usedPt : 0) + nu * 3 + nv * 1 + nl * 0.5;
+              const remainFinal = Math.round((totalPt - usedTotal) * 10) / 10;
+              if (remainFinal < 0) continue;
+
+              // すべてゼロは省く
+              if (!liveOpt && nu === 0 && nv === 0 && nl === 0) continue;
+
+              const items = [];
+              if (liveOpt) {
+                items.push({
+                  benefit: BENEFITS[0],
+                  count: 1,
+                  usedPt: liveOpt.usedPt,
+                  note: `${liveOpt.minutes}分`,
+                });
+              }
+              if (nu > 0) items.push({ benefit: BENEFITS[1], count: nu, usedPt: nu * 3 });
+              if (nv > 0) items.push({ benefit: BENEFITS[2], count: nv, usedPt: nv * 1 });
+              if (nl > 0) items.push({ benefit: BENEFITS[3], count: nl, usedPt: nl * 0.5 });
+
+              results.push({ items, usedTotal, remainFinal });
+            }
+          }
+        }
+      }
+
+      // 消費ptが多い順→残が少ない順で並べ、最大50件に絞る
+      results.sort((a, b) => b.usedTotal - a.usedTotal || a.remainFinal - b.remainFinal);
+      return results.slice(0, 50);
+    }
+
+    /* ==================================================
+       UI 描画
+       ================================================== */
+    function renderCombinations(username, points) {
+      document.getElementById('displayUsername').textContent = username;
+      document.getElementById('displayPoints').textContent = points;
+
+      const combos = calcCombinations(points);
+      const comboList = document.getElementById('comboList');
+      const comboIntro = document.getElementById('comboIntro');
+
+      if (combos.length === 0) {
+        comboIntro.style.display = 'none';
+        comboList.innerHTML = `
+          <div class="no-combo">
+            <span class="no-combo-icon">🌱</span>
+            <div class="no-combo-text">まだ交換できる特典がありません。<br>投げ銭でポイントを貯めてみよう！</div>
+          </div>`;
+        return;
+      }
+
+      comboIntro.textContent = `現在 ${points}pt で交換できる組み合わせが ${combos.length} パターンあります。`;
+
+      comboList.innerHTML = combos.map((combo, i) => {
+        const itemsHTML = combo.items.map(item => {
+          const suffix = item.note ? `（${item.note}）` : '';
+          const countLabel = item.count > 1 ? ` ×${item.count}` : '';
+          return `
+            <div class="combo-item-row">
+              <span class="combo-badge ${item.benefit.badgeClass}">${item.usedPt}pt</span>
+              <span class="combo-item-name">${item.benefit.emoji} ${item.benefit.name}${countLabel}${suffix}</span>
+            </div>`;
+        }).join('<div class="combo-divider"></div>');
+
+        const remainClass = combo.remainFinal === 0 ? 'zero' : 'positive';
+        const remainText = combo.remainFinal === 0
+          ? '✨ ぴったり！'
+          : `残り ${combo.remainFinal}pt`;
+
+        return `
+          <div class="combo-card">
+            <div class="combo-header">
+              <span class="combo-num">パターン ${i + 1}</span>
+              <span class="combo-remaining ${remainClass}">${remainText}</span>
+            </div>
+            <div class="combo-items">${itemsHTML}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function showError() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('errorState').style.display = 'block';
+    }
+
+    function showMain(username, points, updated) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('lastUpdated').textContent = updated
+        ? `最終更新: ${updated}`
+        : '最終更新: 取得中…';
+      renderCombinations(username, points);
+    }
+
+    /* ==================================================
+       初期化
+       ================================================== */
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const username = params.get('user') || '';
+
+      if (!username) { showError(); return; }
+
+      try {
+        let userData;
+
+        if (CONFIG.USE_DUMMY_DATA) {
+          /* ---- ダミーデータ使用 ---- */
+          await new Promise(r => setTimeout(r, 800)); // ローディング演出
+          userData = DUMMY_USERS[username.toLowerCase()] || null;
+        } else {
+          /* ---- 本番: GAS ---- */
+          userData = await fetchPointsFromGAS(username);
+        }
+
+        if (!userData) { showError(); return; }
+
+        showMain(username, userData.points, userData.updated);
+
+      } catch (err) {
+        console.error(err);
+        showError();
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
